@@ -4,16 +4,16 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col justify-between p-6 font-sans">
+    <div className="min-h-screen bg-white text-black flex flex-col justify-between p-6 font-sans">
       {/* Navbar segment */}
       <header className="flex justify-between items-center max-w-6xl w-full mx-auto py-4">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold text-sm">IR</div>
+          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold text-sm text-white">IR</div>
           <span className="font-bold tracking-wider text-lg">repAIr ichiban</span>
         </div>
         <button 
           onClick={() => navigate('/login')}
-          className="border border-neutral-700 hover:border-white px-4 py-1.5 rounded text-sm transition-colors"
+          className="border border-neutral-300 hover:border-black px-4 py-1.5 rounded text-sm transition-colors"
         >
           Sign In
         </button>
@@ -21,7 +21,7 @@ export default function Landing() {
 
       {/* Main Hero Content */}
       <main className="flex-1 flex flex-col items-center justify-center text-center max-w-3xl mx-auto px-4">
-        <div className="text-xs font-semibold tracking-widest text-red-500 uppercase bg-red-950/50 px-3 py-1 rounded-full border border-red-900/40 mb-4">
+        <div className="text-xs font-semibold tracking-widest text-red-600 uppercase bg-red-50 px-3 py-1 rounded-full border border-red-200 mb-4">
           Next-Gen Asset Optimization
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6">
@@ -30,24 +30,24 @@ export default function Landing() {
             Repairs & Metrics
           </span>
         </h1>
-        <p className="text-neutral-400 text-sm md:text-base max-w-xl mb-8 leading-relaxed">
+        <p className="text-neutral-600 text-sm md:text-base max-w-xl mb-8 leading-relaxed">
           Monitor active deployments, track live machine metrics, and handle system health optimization seamlessly from a unified operations dashboard.
         </p>
         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
           <button 
             onClick={() => navigate('/login')}
-            className="bg-red-600 hover:bg-red-700 font-semibold px-8 py-3 rounded text-sm transition-all shadow-lg shadow-red-900/20"
+            className="bg-red-600 hover:bg-red-700 text-white font-semibold px-8 py-3 rounded text-sm transition-all shadow-lg shadow-red-200"
           >
             Launch Console
           </button>
-          <button className="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 font-semibold px-8 py-3 rounded text-sm transition-all">
+          <button className="bg-neutral-100 hover:bg-neutral-200 border border-neutral-200 font-semibold px-8 py-3 rounded text-sm transition-all">
             Documentation
           </button>
         </div>
       </main>
 
       {/* Footer bar */}
-      <footer className="text-center text-xs text-neutral-600 py-4 max-w-6xl w-full mx-auto border-t border-neutral-900">
+      <footer className="text-center text-xs text-neutral-500 py-4 max-w-6xl w-full mx-auto border-t border-neutral-200">
         &copy; {new Date().getFullYear()} repAIr ichiban Operations Network. All rights reserved.
       </footer>
     </div>

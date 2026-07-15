@@ -1,230 +1,309 @@
-import { useState } from 'react';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  LayoutGrid,
+  Wrench,
+  Hammer,
+  BarChart2,
+  Settings,
+  HelpCircle,
+  ShieldCheck,
+  AlertTriangle,
+  ClipboardList,
+  CheckCircle2,
+  Users,
+  DollarSign,
+  MoreVertical,
+} from "lucide-react";
 
-export default function Dashboard() {
-  const [role, setRole] = useState('manager'); // Switch to 'technician' to see assigned work orders
+const navItems = [
+  { label: "Dashboard", icon: LayoutGrid, path: "/dashboard" },
+  { label: "Equipment", icon: Wrench, path: "/equipment" },
+  { label: "Maintenance", icon: Hammer, path: "/maintenance" },
+  { label: "Reports", icon: BarChart2, path: "/reports" },
+];
+
+const alerts = [
+  {
+    tag: "PRESSURE DROP",
+    title: "Hydraulic Unit A-42",
+    detail: "Pressure dropped below 1200 PSI threshold.",
+    time: "12 mins ago",
+  },
+  {
+    tag: "OVERDUE",
+    title: "Conveyor Belt C-Line",
+    detail: "Mandatory 500hr inspection past due.",
+    time: "2 hrs ago",
+  },
+  {
+    tag: "ANOMALY",
+    title: "Robotic Arm R-9",
+    detail: "AI detected abnormal vibration pattern.",
+    time: "4 hrs ago",
+  },
+];
+
+// Role-specific config: bottom stat row + user card
+const roleConfig = {
+  technician: {
+    user: { name: "Alex", title: "Technician" },
+    stats: [
+      {
+        label: "Maintenance To Do",
+        value: "142",
+        icon: ClipboardList,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+      },
+      {
+        label: "Maintenance Completed",
+        value: "24",
+        icon: CheckCircle2,
+        iconBg: "bg-green-100",
+        iconColor: "text-green-600",
+        cardBg: "bg-green-50",
+        border: "border-green-100",
+      },
+      {
+        label: "Technicians Active",
+        value: "8",
+        icon: Users,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+      },
+    ],
+  },
+  manager: {
+    user: { name: "Alexander", title: "Maintenance Manager" },
+    stats: [
+      {
+        label: "Critical Assets",
+        value: "4",
+        icon: ClipboardList,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+      },
+      {
+        label: "Downtime Prevented",
+        value: "148 Hours",
+        icon: CheckCircle2,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+      },
+      {
+        label: "Monthly Maintenance Cost",
+        value: "RM420,000",
+        icon: DollarSign,
+        iconBg: "bg-gray-100",
+        iconColor: "text-gray-500",
+      },
+    ],
+  },
+};
+
+export default function RepairDashboard() {
+  const [role, setRole] = useState("manager");
+  const { user, stats } = roleConfig[role];
+  const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] flex text-gray-800 font-sans antialiased">
-      
-      {/* 1. LEFT NAVIGATION SIDEBAR (Dark Profile Theme) */}
-      <aside className="w-64 bg-[#141414] text-white flex flex-col shrink-0 border-r border-neutral-800 hidden lg:flex">
-        {/* Sidebar Header Brand with red circle logo icon */}
-        <div className="p-5 border-b border-neutral-800 flex items-center space-x-3 bg-[#0d0d0d]">
-          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center font-bold text-sm tracking-tight text-white shadow-inner">
-            IR
+    <div className="flex min-h-screen w-full bg-[#eef1f6] font-sans text-[#1f2430]">
+      {/* Sidebar */}
+      <aside className="flex w-60 shrink-0 flex-col border-r border-[#e3e7ee] bg-white px-4 py-5">
+        <div className="mb-8 flex items-center gap-2 px-1">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <Wrench size={16} strokeWidth={2.5} />
           </div>
-          <div>
-            <span className="font-black tracking-tight text-sm block">repAIr ichiban</span>
-            <span className="text-[9px] text-neutral-500 uppercase font-bold tracking-widest block">Core Console</span>
+          <div className="leading-tight">
+            <p className="text-[11px] text-gray-400">Welcome to</p>
+            <p className="-mt-0.5 text-lg font-bold tracking-tight text-red-600">
+              rep<span className="text-red-600">AI</span>r
+            </p>
           </div>
         </div>
-        
-        {/* Navigation Items Links */}
-        <nav className="flex-1 p-3 space-y-1 text-xs font-bold uppercase tracking-wider">
-          {/* Active Option with Left Red Accent Bar */}
-          <div className="bg-[#1f1f1f] text-white px-4 py-3 rounded-md flex items-center justify-between border-l-4 border-red-600 cursor-pointer shadow-sm">
-            <span>System Dashboard</span>
-            <span className="text-[10px] text-red-500">●</span>
-          </div>
-          <div className="text-neutral-400 hover:bg-[#1a1a1a] hover:text-white px-4 py-3 rounded-md cursor-pointer transition-colors">
-            Equipment / Fleet
-          </div>
-          <div className="text-neutral-400 hover:bg-[#1a1a1a] hover:text-white px-4 py-3 rounded-md cursor-pointer transition-colors">
-            Maintenance Queue
-          </div>
-          <div className="text-neutral-400 hover:bg-[#1a1a1a] hover:text-white px-4 py-3 rounded-md cursor-pointer transition-colors">
-            Reports Dashboard
-          </div>
+
+        <nav className="flex flex-col gap-1">
+          {navItems.map(({ label, icon: Icon, path }) => {
+            const active = location.pathname === path;
+            return (
+              <Link
+                key={label}
+                to={path}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  active
+                    ? "bg-red-600 text-white shadow-sm"
+                    : "text-gray-500 hover:bg-gray-50"
+                }`}
+              >
+                <Icon size={17} strokeWidth={2} />
+                {label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Development Quick Switcher Sandbox Block */}
-        <div className="p-4 bg-[#0d0d0d] border-t border-neutral-800 m-3 rounded-lg">
-          <label className="block text-[9px] text-neutral-500 font-bold uppercase tracking-widest mb-2">Simulate Team Role View</label>
-          <div className="grid grid-cols-2 gap-1.5 text-[10px]">
-            <button 
-              onClick={() => setRole('manager')} 
-              className={`py-1.5 rounded font-black uppercase transition-all ${role === 'manager' ? 'bg-red-600 text-white shadow-md' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
+        <div className="mt-auto flex flex-col gap-1 border-t border-[#eceff4] pt-4">
+          {/* Role switcher - not part of original design, added for demo convenience */}
+          <div className="mb-2 flex rounded-lg bg-gray-50 p-1 text-xs font-medium">
+            <button
+              onClick={() => setRole("technician")}
+              className={`flex-1 rounded-md py-1.5 transition-colors ${
+                role === "technician"
+                  ? "bg-white text-red-600 shadow-sm"
+                  : "text-gray-400"
+              }`}
+            >
+              Technician
+            </button>
+            <button
+              onClick={() => setRole("manager")}
+              className={`flex-1 rounded-md py-1.5 transition-colors ${
+                role === "manager"
+                  ? "bg-white text-red-600 shadow-sm"
+                  : "text-gray-400"
+              }`}
             >
               Manager
             </button>
-            <button 
-              onClick={() => setRole('technician')} 
-              className={`py-1.5 rounded font-black uppercase transition-all ${role === 'technician' ? 'bg-red-600 text-white shadow-md' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
-            >
-              Tech
-            </button>
+          </div>
+
+          <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <Settings size={17} strokeWidth={2} />
+            Settings
+          </button>
+          <button className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <HelpCircle size={17} strokeWidth={2} />
+            Support
+          </button>
+
+          <div className="mt-3 flex items-center gap-3 rounded-lg px-2 py-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-500">
+              <Wrench size={15} strokeWidth={2.5} />
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-gray-800">
+                {user.name}
+              </p>
+              <p className="text-xs text-gray-400">{user.title}</p>
+            </div>
+            <MoreVertical size={16} className="ml-auto text-gray-300" />
           </div>
         </div>
       </aside>
 
-      {/* 2. MAIN SYSTEM PLATFORM INTERFACE */}
-      <main className="flex-1 flex flex-col min-w-0">
-        
-        {/* Top Operational Status Header Panel */}
-        <header className="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-6 shadow-sm">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-base font-black uppercase tracking-tight text-gray-900">Operational Overview</h2>
-            <div className="bg-red-50 border border-red-200 text-red-600 font-bold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              Network Mode: <span className="underline">{role}</span>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="text-right">
-              <span className="text-xs font-bold text-gray-900 block">Operator Secure Node</span>
-              <span className="text-[10px] text-gray-400 uppercase font-semibold block">ID: 023-SYS</span>
-            </div>
-            <div className="w-8 h-8 bg-[#141414] border border-neutral-800 text-white rounded-full flex items-center justify-center text-xs font-black">
-              {role === 'manager' ? 'MG' : 'TC'}
-            </div>
-          </div>
-        </header>
+      {/* Main content */}
+      <main className="flex-1 px-10 py-8">
+        <h1 className="text-[28px] font-extrabold tracking-tight text-gray-900">
+          What needs attention today?
+        </h1>
+        <p className="mt-1 text-sm text-gray-400">
+          Overview of critical alerts, high-risk assets, and maintenance progress.
+        </p>
 
-        {/* Modular Grid Area */}
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
-          
-          {/* A. CRITICAL SYSTEM INTERCEPT ALERTS (Required layout panel)[cite: 1] */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-            <div className="bg-red-600 text-white px-4 py-2.5 flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-xs font-black uppercase tracking-widest">
-                <span className="animate-ping text-white mr-1">⚠️</span>
-                <span>Critical Equipment Fault Pipeline</span>
+        <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
+          {/* Left column */}
+          <div className="rounded-2xl border border-[#eceff4] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] lg:self-start">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-[15px] font-bold text-gray-900">
+                  Equipment
+                  <br />
+                  Health Summary
+                </h2>
+                <p className="mt-1 text-xs text-gray-400">
+                  Overall equipment health index
+                </p>
               </div>
-              <span className="bg-red-700 text-[9px] font-black px-2 py-0.5 rounded uppercase">2 Active Triggers</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                <ShieldCheck size={18} strokeWidth={2} />
+              </div>
             </div>
-            <div className="p-2 bg-neutral-50 divide-y divide-gray-200">
-              <div className="p-3 flex justify-between items-center text-xs">
-                <div>
-                  <span className="font-mono text-red-600 font-bold mr-2">[ALT-102]</span>
-                  <strong className="text-gray-900">Excavator Delta-4</strong> — Hydraulic fluid temperatures exceeding safe operational thresholds[cite: 1].
-                </div>
-                <span className="text-[10px] font-bold text-gray-400 bg-white border px-2 py-1 rounded">5m ago</span>
-              </div>
-              <div className="p-3 flex justify-between items-center text-xs">
-                <div>
-                  <span className="font-mono text-amber-600 font-bold mr-2">[ALT-105]</span>
-                  <strong className="text-gray-900">CNC Router Prime</strong> — Spindle axial runout variance limits breached[cite: 1].
-                </div>
-                <span className="text-[10px] font-bold text-gray-400 bg-white border px-2 py-1 rounded">12m ago</span>
-              </div>
+
+            <div className="mt-5 text-[40px] font-extrabold leading-none text-gray-900">
+              88%
+            </div>
+
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-green-400 to-green-500"
+                style={{ width: "88%" }}
+              />
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <span className="rounded-md bg-gray-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-gray-500">
+                RISK: MEDIUM
+              </span>
+              <span className="rounded-md bg-gray-100 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-gray-500">
+                1 CRITICAL
+              </span>
             </div>
           </div>
 
-          {/* B. CONDITIONAL FEATURE MODULES DISPLAY */}
-          {role === 'manager' ? (
-            /* MANAGER EXECUTIVE SUMMARY SUITE[cite: 1] */
-            <div className="space-y-6">
-              
-              {/* Fleet Statistics KPI Block Rows[cite: 1] */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-l-4 border-l-neutral-900">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Fleet Health Score</p>
-                  <h3 className="text-2xl font-black text-gray-900 mt-0.5">94.2%</h3>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-l-4 border-l-red-600">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Critical Asset Summaries</p>
-                  <h3 className="text-2xl font-black text-gray-900 mt-0.5">02 Breached</h3>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-l-4 border-l-neutral-900">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Monthly Operation Overhead</p>
-                  <h3 className="text-2xl font-black text-gray-900 mt-0.5">$14,250</h3>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 border-l-4 border-l-emerald-600">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">AI Preventative Savings</p>
-                  <h3 className="text-2xl font-black text-emerald-600 mt-0.5">36.5 Hours</h3>
-                </div>
+          {/* Right column */}
+          <div className="rounded-2xl border border-[#eceff4] bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertTriangle size={18} className="text-red-500" strokeWidth={2.2} />
+                <h2 className="text-[15px] font-bold text-gray-900">
+                  Critical Alerts
+                </h2>
               </div>
-
-              {/* Maintenance Statistics Analysis Grid Area[cite: 1] */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm md:col-span-2">
-                  <div className="border-b border-gray-100 pb-3 mb-4 flex justify-between items-center">
-                    <h4 className="font-black text-xs uppercase tracking-wider text-gray-500">Fleet Operations Analytics Matrix</h4>
-                    <span className="text-[10px] font-bold text-red-600">Live Engine Diagnostics</span>
-                  </div>
-                  {/* Clean mockup tracking grid lines imitating your image rows */}
-                  <div className="space-y-2">
-                    <div className="h-6 bg-red-600 rounded text-[10px] font-bold text-white flex items-center px-3 justify-between w-full">
-                      <span>Heavy Excavator Fleet Node (Group A)</span>
-                      <span>91% Performance Cap</span>
-                    </div>
-                    <div className="h-6 bg-neutral-900 rounded text-[10px] font-bold text-white flex items-center px-3 justify-between w-[85%]">
-                      <span>CNC Assembly Grid Line (Group B)</span>
-                      <span>85% Capacity</span>
-                    </div>
-                    <div className="h-6 bg-neutral-400 rounded text-[10px] font-bold text-white flex items-center px-3 justify-between w-[64%]">
-                      <span>Auxiliary Generator Cells (Group C)</span>
-                      <span>64% Operations Load</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Secondary data widget sidebar summary panel */}
-                <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm flex flex-col justify-between">
-                  <div>
-                    <h5 className="font-black text-xs uppercase tracking-wider text-gray-500 border-b pb-2 mb-3">KPI Target Threshold</h5>
-                    <div className="w-24 h-24 rounded-full border-8 border-red-600 border-b-neutral-200 mx-auto my-2 flex items-center justify-center">
-                      <span className="text-lg font-black">88%</span>
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-center text-gray-400 px-2 font-medium">System performance metrics currently tracking green across target vectors[cite: 1].</p>
-                </div>
-              </div>
-
+              <button className="text-sm font-semibold text-red-500 hover:underline">
+                View All
+              </button>
             </div>
-          ) : (
-            /* TECHNICIAN WORK TRACKING INTERFACE[cite: 1] */
-            <div className="space-y-6">
-              
-              {/* Technician Task Progress Cards[cite: 1] */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Assigned Operations Orders</p>
-                  <h3 className="text-2xl font-black text-gray-900 mt-0.5">2 Active</h3>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Today's Schedule Allocations</p>
-                  <h3 className="text-2xl font-black text-blue-600 mt-0.5">3 Slots Remaining</h3>
-                </div>
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Shift Performance Ratio</p>
-                  <h3 className="text-2xl font-black text-emerald-600 mt-0.5">85% Efficiency</h3>
-                </div>
-              </div>
 
-              {/* Work Order Ledger Table View[cite: 1] */}
-              <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-                <div className="p-4 bg-neutral-50 border-b font-black text-xs uppercase tracking-wider text-gray-500">
-                  Active Work Verification Backlog
-                </div>
-                <div className="divide-y divide-gray-200 text-xs">
-                  <div className="p-4 flex justify-between items-center hover:bg-neutral-50/50 transition-colors">
-                    <div>
-                      <span className="font-mono text-[10px] text-gray-400 block font-bold">TICKET: WO-401</span>
-                      <strong className="text-sm text-gray-900 font-bold block mt-0.5">Generator Module 2</strong>
-                      <span className="text-gray-500">Execute voltage droop correction and calibration sequences[cite: 1].</span>
-                    </div>
-                    <span className="bg-amber-100 text-amber-800 font-black px-3 py-1 rounded text-[10px] uppercase tracking-wider">
-                      In Progress
+            <div className="mt-3 flex flex-col divide-y divide-[#f1f3f7]">
+              {alerts.map((a) => (
+                <div key={a.title} className="flex items-start gap-3 py-3.5">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                  <div className="flex-1">
+                    <span className="inline-block rounded bg-red-600 px-2 py-0.5 text-[10px] font-bold tracking-wide text-white">
+                      {a.tag}
                     </span>
+                    <p className="mt-1.5 text-sm font-semibold text-gray-900">
+                      {a.title}
+                    </p>
+                    <p className="text-xs text-gray-400">{a.detail}</p>
                   </div>
-                  <div className="p-4 flex justify-between items-center hover:bg-neutral-50/50 transition-colors">
-                    <div>
-                      <span className="font-mono text-[10px] text-gray-400 block font-bold">TICKET: WO-402</span>
-                      <strong className="text-sm text-gray-900 font-bold block mt-0.5">Conveyor Belt C</strong>
-                      <span className="text-gray-500">Photoelectric alignment tuning and hardware check verification[cite: 1].</span>
-                    </div>
-                    <span className="bg-gray-100 text-gray-600 font-black px-3 py-1 rounded text-[10px] uppercase tracking-wider">
-                      Pending
-                    </span>
-                  </div>
+                  <span className="whitespace-nowrap text-xs text-gray-400">
+                    {a.time}
+                  </span>
                 </div>
-              </div>
-
+              ))}
             </div>
-          )}
+          </div>
 
+          {/* Bottom stat row - spans both columns */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 lg:col-span-2">
+            {stats.map((s) => (
+              <StatCard key={s.label} {...s} />
+            ))}
+          </div>
         </div>
       </main>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon: Icon, iconBg, iconColor, cardBg, border }) {
+  return (
+    <div
+      className={`flex items-center justify-between rounded-2xl border ${
+        border || "border-[#eceff4]"
+      } ${cardBg || "bg-white"} p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]`}
+    >
+      <div>
+        <p className="text-xs text-gray-400">{label}</p>
+        <p className="mt-1.5 text-2xl font-extrabold text-gray-900">{value}</p>
+      </div>
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-full ${iconBg} ${iconColor}`}
+      >
+        <Icon size={18} strokeWidth={2.2} />
+      </div>
     </div>
   );
 }
